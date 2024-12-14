@@ -1,0 +1,48 @@
+
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
+
+
+class ChatConsumer(WebsocketConsumer):
+    
+    def connect(self):
+        self.accept()
+        self.send('{ "type":"accept" , "status" : "accepted" }')
+        async_to_sync(self.channel_layer.group_add)("group_channels" , self.channel_name) 
+
+        # print(self.scope)
+        # print(self.scope.get("url_route").get("kwargs").get("name"))
+
+        # print(self.scope.get("user"))  
+        # print(self.scope.get("user").id)  
+        # print(self.scope.get("user").first_name)  
+        # print(self.scope.get("user").last_name)  
+        # to get the user and session
+        # print(self.scope.get("session"))
+        # self.scope.get("session")["get_me_from_the_main_page"] = "hi this is me"
+
+        # print(self.channel_name)
+        # async_to_sync(self.channel_layer.group_add)("momo_group" , self.channel_name)
+
+        # print(self.channel_layer.groups)
+        # print(self.channel_layer.channels)
+        # print(self.channel_layer.groups)
+
+        # print(type(self.channel_layer))  # check time span 8.08 how dows layer work
+        data = {
+            "type" : "reciver.function",
+        }
+        async_to_sync(self.channel_layer.group_send)("group_channels" , data) 
+
+    def receive(self, text_data):
+        print(text_data)
+        self.send(' {"type":"event_arrive" , "status" : "arrived"} ')
+
+
+    def disconnect(self, code):
+        print(code)
+        print("hello, the connection is failed or stoped")
+
+    
+    def reciver_function(self, recived_data):
+        print(recived_data)
